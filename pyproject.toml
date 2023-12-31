@@ -5,7 +5,7 @@ description = "Generator for new year toots"
 authors = ["George Kaye <georgejkaye@gmail.com>"]
 license = "GPL-v3.0-or-later"
 readme = "README.md"
-packages = [{include = "ny_tootgen", from = "src"}]
+packages = [{include = "newyear_tootgen", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
