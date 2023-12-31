@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
+from pathlib import Path
 import requests
 import flag
 
@@ -60,11 +61,18 @@ def country_to_caps_emoji(country: Country) -> str:
     return f"{name} {emoji}"
 
 
-def write_toot(countries: list[Country]) -> str:
+def get_toot(countries: list[Country]) -> str:
     country_string_list = [country_to_caps_emoji(country) for country in countries]
     concated_countries = " ".join(country_string_list)
     prefix = "WELCOME TO 2024"
     return f"{prefix} {concated_countries}"
+
+
+def write_toot_to_file(toot_time: datetime, toot: str):
+    toot_dir = Path("toots")
+    file_name = toot_dir / toot_time.strftime("%Y-%m-%d-%H%M")
+    with open(file_name, "w") as f:
+        f.write(toot)
 
 
 def main():
@@ -73,17 +81,8 @@ def main():
     newyear_array = newyear_dict.items()
     newyear_sorted = sorted(newyear_array, key=lambda a: a[0])
     for x in newyear_sorted:
-        print()
-        print()
-        print(write_toot(x[1]))
-    # sorted_array = sorted(newyear_dict.items(), lambda a: a[0])
-
-    # for capital in capitals:
-    #     data = capitals[capital]
-    #     flag_emoji = get_flag_emoji(data["country_code"])
-    #     country = data["name"]
-    #     utc = get_utc_of_new_year(data["    "])
-    #     print(f"{country} {flag_emoji}")
+        toot = get_toot(x[1])
+        write_toot_to_file(x[0], toot)
 
 
 if __name__ == "__main__":
