@@ -39,7 +39,15 @@ def get_utc_of_new_year(time_zone: str) -> datetime:
     response = requests.get(url)
     json = response.json()
     raw_offset = int(json["raw_offset"])
-    utc_newyear = datetime(2024, 1, 1) - timedelta(seconds=raw_offset)
+    if json["dst"]:
+        dst_offset = int(json["dst_offset"])
+    else:
+        dst_offset = 0
+    utc_newyear = (
+        datetime(2024, 1, 1)
+        - timedelta(seconds=raw_offset)
+        - timedelta(seconds=dst_offset)
+    )
     return utc_newyear
 
 
