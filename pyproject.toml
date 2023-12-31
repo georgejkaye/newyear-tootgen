@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ny-tootgen"
+name = "newyear-tootgen"
 version = "1.0.0"
 description = "Generator for new year toots"
 authors = ["George Kaye <georgejkaye@gmail.com>"]
