@@ -7,8 +7,9 @@ services:
         POETRY_VERSION: 1.5.1
     environment:
       MASTODON_OAUTH_TOKEN: /run/secrets/token
-    volumes:
-      - ./toots:/app/toots
+      TOOTS_DIR: /app/toots
+    # volumes:
+    #   - ./toots:/app/toots
     secrets:
       - token
 secrets:

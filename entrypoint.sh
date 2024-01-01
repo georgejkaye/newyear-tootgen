@@ -3,6 +3,8 @@
 # Make sure cron can see environment variables
 printenv >> /etc/environment
 
+mkdir $TOOTS_DIR
+
 # Set up stdour and stderr for docker logs
 mkfifo /tmp/stdout /tmp/stderr
 chmod 0666 /tmp/stdout /tmp/stderr
