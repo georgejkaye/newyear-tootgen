@@ -8,8 +8,6 @@ services:
     environment:
       MASTODON_OAUTH_TOKEN: /run/secrets/token
       TOOTS_DIR: /app/toots
-    # volumes:
-    #   - ./toots:/app/toots
     secrets:
       - token
 secrets:
