@@ -43,7 +43,7 @@ def post_status(text: str, reply_to: Optional[int] = None) -> Optional[int]:
 
 def main():
     current_time = datetime.today()
-    current_time_file = Path("/app/toots") / current_time.strftime("%Y-%m-%d-%H%M")
+    current_time_file = Path("/app/toots") / current_time.strftime("%m-%d-%H%M")
     if not os.path.isfile(current_time_file):
         print(f"File {current_time_file} not found")
     else:

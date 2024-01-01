@@ -78,7 +78,7 @@ def get_toot(countries: list[Country]) -> str:
 
 def write_toot_to_file(toot_time: datetime, toot: str):
     toot_dir = Path("toots")
-    file_name = toot_dir / toot_time.strftime("%Y-%m-%d-%H%M")
+    file_name = toot_dir / toot_time.strftime("%m-%d-%H%M")
     with open(file_name, "w") as f:
         f.write(toot)
 
