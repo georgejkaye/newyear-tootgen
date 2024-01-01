@@ -1,8 +1,9 @@
-from dataclasses import dataclass
-from datetime import datetime, time, timedelta
-from pathlib import Path
+import json
 import requests
 import flag
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from pathlib import Path
 
 
 countries_json_url = "https://gist.githubusercontent.com/emnsen/a2364b401d1cb02ac09a850a57017994/raw/bada9a4dcc6ac20428d0abfde4204bbce3f0c3f1/country-codes.json"
@@ -69,28 +70,40 @@ def country_to_caps_emoji(country: Country) -> str:
     return f"{name} {emoji}"
 
 
-def get_toot(countries: list[Country]) -> str:
+toot_length = 400
+
+
+def get_toots(countries: list[Country], year: int) -> list[str]:
     country_string_list = [country_to_caps_emoji(country) for country in countries]
-    concated_countries = " ".join(country_string_list)
-    prefix = "WELCOME TO 2024"
-    return f"{prefix} {concated_countries}"
+    string = f"WELCOME TO {year}"
+    strings = []
+    for country_string in country_string_list:
+        if len(string) + len(country_string) > (toot_length - 3):
+            string = f"{string}..."
+            strings.append(string)
+            string = f"...{country_string}"
+        else:
+            string = f"{string} {country_string}"
+    strings.append(string)
+    return strings
 
 
-def write_toot_to_file(toot_time: datetime, toot: str):
+def write_toot_to_file(toot_time: datetime, toots: list[str]):
     toot_dir = Path("toots")
-    file_name = toot_dir / toot_time.strftime("%m-%d-%H%M")
+    file_name = toot_dir / toot_time.strftime("%Y-%m-%d-%H%M")
     with open(file_name, "w") as f:
-        f.write(toot)
+        json.dump(toots, f)
 
 
 def main():
+    year = datetime.today().year + 1
     countries = get_countries_dict()
     newyear_dict = get_newyear_dict(countries)
     newyear_array = newyear_dict.items()
     newyear_sorted = sorted(newyear_array, key=lambda a: a[0])
     for x in newyear_sorted:
-        toot = get_toot(x[1])
-        write_toot_to_file(x[0], toot)
+        toots = get_toots(x[1], year)
+        write_toot_to_file(x[0], toots)
 
 
 if __name__ == "__main__":
