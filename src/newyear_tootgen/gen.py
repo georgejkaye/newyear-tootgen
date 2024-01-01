@@ -35,7 +35,7 @@ def get_flag_emoji(country_code: str) -> str:
     return flag.flag(country_code)
 
 
-def get_utc_of_new_year(time_zone: str) -> datetime:
+def get_utc_of_new_year(time_zone: str, year: int) -> datetime:
     url = f"http://worldtimeapi.org/api/timezone/{time_zone}"
     response = requests.get(url)
     json = response.json()
@@ -45,18 +45,20 @@ def get_utc_of_new_year(time_zone: str) -> datetime:
     else:
         dst_offset = 0
     utc_newyear = (
-        datetime(2024, 1, 1)
+        datetime(year, 1, 1)
         - timedelta(seconds=raw_offset)
         - timedelta(seconds=dst_offset)
     )
     return utc_newyear
 
 
-def get_newyear_dict(countries: list[Country]) -> dict[datetime, list[Country]]:
+def get_newyear_dict(
+    countries: list[Country], year: int
+) -> dict[datetime, list[Country]]:
     newyear_dict = {}
     for country in countries:
         time_zone = country.time_zone
-        newyear_utc = get_utc_of_new_year(time_zone)
+        newyear_utc = get_utc_of_new_year(time_zone, year)
         if newyear_dict.get(newyear_utc) is None:
             newyear_dict[newyear_utc] = [country]
         else:
@@ -98,7 +100,7 @@ def write_toot_to_file(toot_time: datetime, toots: list[str]):
 def main():
     year = datetime.today().year + 1
     countries = get_countries_dict()
-    newyear_dict = get_newyear_dict(countries)
+    newyear_dict = get_newyear_dict(countries, year)
     newyear_array = newyear_dict.items()
     newyear_sorted = sorted(newyear_array, key=lambda a: a[0])
     for x in newyear_sorted:
