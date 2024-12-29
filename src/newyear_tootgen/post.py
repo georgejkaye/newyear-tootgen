@@ -29,7 +29,7 @@ def post_status(text: str, reply_to: Optional[int] = None) -> Optional[int]:
     token = get_token()
     headers = {
         "Authorization": f"Bearer {token}",
-        "Idempotency-Key": str(datetime.today().timestamp),
+        "Idempotency-Key": str(datetime.today().timestamp()),
     }
     params = {"status": text, "in_reply_to_id": reply_to}
     url = "https://mastodon.douvk.co.uk/api/v1/statuses"
@@ -39,6 +39,7 @@ def post_status(text: str, reply_to: Optional[int] = None) -> Optional[int]:
         id = int(json["id"])
         return id
     else:
+        print(response)
         return None
 
 
