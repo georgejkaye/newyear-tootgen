@@ -42,10 +42,10 @@ def post_status(text: str, reply_to: Optional[int] = None) -> Optional[int]:
         return None
 
 
-def post_toot(toot: str) -> Optional[int]:
+def post_toot(toot: str, set_reply: bool = False) -> Optional[int]:
     reply_id = get_reply_id()
     new_id = post_status(toot, reply_id)
-    if new_id is not None:
+    if new_id is not None and set_reply:
         set_reply_id(new_id)
     return new_id
 
@@ -54,10 +54,12 @@ toots_dir = Path(get_env_var("TOOTS_DIR"))
 reply_file = toots_dir / "reply"
 
 
-def get_reply_id() -> int:
-    with open(reply_file) as f:
-        reply_id = int(f.read().replace("\n", ""))
-    return reply_id
+def get_reply_id() -> Optional[int]:
+    if os.path.isfile(reply_file):
+        with open(reply_file) as f:
+            reply_id = int(f.read().replace("\n", ""))
+        return reply_id
+    return None
 
 
 def set_reply_id(new_id: int):
@@ -79,7 +81,7 @@ def main():
     else:
         toots = read_toots(current_time_file)
         for toot in toots:
-            response = post_toot(toot)
+            response = post_toot(toot, True)
             if response is None:
                 break
 
