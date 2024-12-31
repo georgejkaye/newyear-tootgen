@@ -1,10 +1,12 @@
+from genericpath import isdir
 import json
+import os
 import requests
 import flag
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-
+from zoneinfo import ZoneInfo
 
 countries_json_url = "https://gist.githubusercontent.com/emnsen/a2364b401d1cb02ac09a850a57017994/raw/bada9a4dcc6ac20428d0abfde4204bbce3f0c3f1/country-codes.json"
 
@@ -36,20 +38,11 @@ def get_flag_emoji(country_code: str) -> str:
 
 
 def get_utc_of_new_year(time_zone: str, year: int) -> datetime:
-    url = f"http://worldtimeapi.org/api/timezone/{time_zone}"
-    response = requests.get(url)
-    json = response.json()
-    raw_offset = int(json["raw_offset"])
-    if json["dst"]:
-        dst_offset = int(json["dst_offset"])
-    else:
-        dst_offset = 0
-    utc_newyear = (
-        datetime(year, 1, 1)
-        - timedelta(seconds=raw_offset)
-        - timedelta(seconds=dst_offset)
+    return (
+        datetime(year, 1, 1, 0, 0, 0)
+        .replace(tzinfo=ZoneInfo(time_zone))
+        .astimezone(ZoneInfo("Europe/London"))
     )
-    return utc_newyear
 
 
 def get_newyear_dict(
@@ -57,8 +50,10 @@ def get_newyear_dict(
 ) -> dict[datetime, list[Country]]:
     newyear_dict = {}
     for country in countries:
+        print(f"Getting new year time for {country.name}")
         time_zone = country.time_zone
         newyear_utc = get_utc_of_new_year(time_zone, year)
+        print(f"New year for {country.name} is {newyear_utc}")
         if newyear_dict.get(newyear_utc) is None:
             newyear_dict[newyear_utc] = [country]
         else:
@@ -92,6 +87,8 @@ def get_toots(countries: list[Country], year: int) -> list[str]:
 
 def write_toot_to_file(toot_time: datetime, toots: list[str]):
     toot_dir = Path("toots")
+    if not os.path.isdir(toot_dir):
+        os.mkdir(toot_dir)
     file_name = toot_dir / toot_time.strftime("%Y-%m-%d-%H%M")
     with open(file_name, "w") as f:
         json.dump(toots, f)
